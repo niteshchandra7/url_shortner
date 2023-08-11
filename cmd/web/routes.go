@@ -7,6 +7,7 @@ import (
 	"github.com/niteshchandra7/url_shortner/pkg/handlers"
 )
 
+// GetRoutes return a mux to server
 func GetRoutes() http.Handler {
 	mux := chi.NewRouter()
 	mux.Get("/", handlers.Home)
