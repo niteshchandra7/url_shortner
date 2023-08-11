@@ -36,23 +36,20 @@ func CreateTemplateCache() error {
 	if err != nil {
 		log.Fatal("templates dir has no page.go.tmpl file", err)
 	}
-	err = CreateTemplates(pages)
-	if err != nil {
-		log.Fatal(err)
-	}
 	layouts, err := filepath.Glob("./templates/*layout.go.tmpl")
 	if err != nil || len(layouts) == 0 {
 		log.Fatal("templates dir has no layout.go.tmpl file", err)
 	}
-	err = CreateTemplates(layouts)
+	err = CreateTemplates(pages, layouts)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return nil
 }
 
 // CreateTemplates store template and pageName into TemplateCache
-func CreateTemplates(pages []string) error {
+func CreateTemplates(pages []string, layouts []string) error {
 	for _, page := range pages {
 		tmpl, err := template.ParseFiles(page)
 		if err != nil {
@@ -60,6 +57,7 @@ func CreateTemplates(pages []string) error {
 		}
 		pageName := strings.TrimPrefix(page, "templates/")
 		tmpl = tmpl.New(pageName)
+		tmpl.ParseFiles(layouts...)
 		repository.TemplateCache[pageName] = tmpl
 	}
 	return nil
