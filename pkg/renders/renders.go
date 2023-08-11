@@ -14,12 +14,14 @@ import (
 // Repository creates repository for render package
 type Repository struct {
 	TemplateCache map[string]*template.Template
+	InProduction  bool
 }
 
 // GetNewRepo creates and return a new render repository
 func GetNewRepo(app *config.AppConfig) *Repository {
 	return &Repository{
 		TemplateCache: app.TemplateCache,
+		InProduction:  app.InProduction,
 	}
 }
 
@@ -65,6 +67,13 @@ func CreateTemplates(pages []string, layouts []string) error {
 
 // New renders the page from TemplateCache
 func New(w http.ResponseWriter, r *http.Request, pageName string) {
+	if !repository.InProduction {
+		layouts, err := filepath.Glob("./templates/*layout.go.tmpl")
+		if err != nil || len(layouts) == 0 {
+			log.Fatal("templates dir has no layout.go.tmpl file", err)
+		}
+		CreateTemplates([]string{"templates/" + pageName}, layouts)
+	}
 	tmpl, ok := repository.TemplateCache[pageName]
 	if !ok {
 		log.Fatal("page not found in template cache")

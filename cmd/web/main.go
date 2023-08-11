@@ -16,6 +16,7 @@ var appConfig *config.AppConfig
 
 func main() {
 	appConfig = config.New(portNumber)
+	appConfig.InProduction = false
 	setupApplication()
 	server := &http.Server{
 		Addr:    appConfig.Addr,

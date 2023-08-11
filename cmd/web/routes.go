@@ -10,6 +10,7 @@ import (
 // GetRoutes return a mux to server
 func GetRoutes() http.Handler {
 	mux := chi.NewRouter()
+	mux.Use(NoSurf)
 	mux.Get("/", handlers.Home)
 	return mux
 }
