@@ -1,0 +1,1 @@
+go run ./cmd/web/... -o url_shortner && ./url_shortner 
