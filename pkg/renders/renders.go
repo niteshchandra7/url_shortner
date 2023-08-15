@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/justinas/nosurf"
 	"github.com/niteshchandra7/url_shortner/pkg/config"
 	"github.com/niteshchandra7/url_shortner/pkg/models"
 )
@@ -65,8 +66,13 @@ func CreateTemplates(pages []string, layouts []string) error {
 	return nil
 }
 
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
+	return td
+}
+
 // New renders the page from TemplateCache
-func New(w http.ResponseWriter, r *http.Request, pageName string) {
+func New(w http.ResponseWriter, r *http.Request, pageName string, td *models.TemplateData) {
 	if !repository.InProduction {
 		layouts, err := filepath.Glob("./templates/*layout.go.tmpl")
 		if err != nil || len(layouts) == 0 {
@@ -79,5 +85,6 @@ func New(w http.ResponseWriter, r *http.Request, pageName string) {
 		log.Fatal("page not found in template cache")
 
 	}
-	tmpl.Execute(w, models.TemplateData{})
+	td = AddDefaultData(td, r)
+	tmpl.Execute(w, td)
 }

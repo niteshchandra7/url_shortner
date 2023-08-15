@@ -1,10 +1,11 @@
 {{template "base" .}}
 
 {{define "content"}}
-<form class="row mt-5 mx-5">
+<form method="post" action="/shorten" class="row mt-5 mx-5">
+  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
   <div class="col-auto w-50">
     <label for="url" class="visually-hidden">Enter your URL:</label>
-    <input type="text" class="form-control" id="url" placeholder="ex: http://www.google.com">
+    <input type="text" class="form-control" id="url" name="url" placeholder="ex: http://www.google.com">
   </div>
   <div class="col-auto">
     <button type="submit" class="btn btn-primary mb-3">Shorten URL</button>

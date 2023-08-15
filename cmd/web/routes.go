@@ -11,6 +11,7 @@ import (
 func GetRoutes() http.Handler {
 	mux := chi.NewRouter()
 	mux.Use(NoSurf)
-	mux.Get("/", handlers.Home)
+	mux.Get("/", handlers.Repo.Home)
+	mux.Post("/shorten", handlers.Repo.PostShorten)
 	return mux
 }
