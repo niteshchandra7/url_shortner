@@ -15,15 +15,12 @@ import (
 	"github.com/niteshchandra7/url_shortner/pkg/repository/dbrepo"
 )
 
-const (
-	portNumber = ":8080"
-)
-
 var appConfig *config.AppConfig
 var session *scs.SessionManager
 
 func main() {
-	appConfig = config.New(portNumber)
+	config.LoadEnvironment()
+	appConfig = config.New(os.Getenv("PORT"))
 	appConfig.InProduction = false
 
 	session = scs.New()
@@ -49,7 +46,6 @@ func main() {
 }
 
 func setupApplication() {
-	config.LoadEnvironment()
 	db, err := drivers.ConnectSQL(os.Getenv("DSN"))
 	if err != nil {
 		log.Panicln(err)
@@ -57,5 +53,5 @@ func setupApplication() {
 	appConfig.DB = db
 	renders.SetNewRepo(renders.GetNewRepo(appConfig))
 	renders.CreateTemplateCache()
-	handlers.SetNewRepo(handlers.GetNewRepo(appConfig,dbrepo.NewPostgresRepo(appConfig)))
+	handlers.SetNewRepo(handlers.GetNewRepo(appConfig, dbrepo.NewPostgresRepo(appConfig)))
 }

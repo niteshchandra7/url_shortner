@@ -3,12 +3,13 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/niteshchandra7/url_shortner/pkg/config"
 	"github.com/niteshchandra7/url_shortner/pkg/models"
 	"github.com/niteshchandra7/url_shortner/pkg/renders"
 	"github.com/niteshchandra7/url_shortner/pkg/repository"
-	"github.com/niteshchandra7/url_shortner/pkg/repository/dbrepo"
 )
 
 type Repository struct {
@@ -41,13 +42,22 @@ func (m *Repository) PostShorten(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	link := r.Form.Get("url")
-	exists := dbrepo.NewPostgresRepo(m.AppConfig).Exists(link)
+	var shorten_link string
+	shorten_link, exists := m.DBRepo.GetShortenLinkFromLink(link)
 	if !exists {
-		log.Println("link doesn't exist in db")
-	} else {
-		log.Println("link exists in db")
+		shorten_link = m.DBRepo.CreateAndInsertShortenLinkFromLink(link)
 	}
-	http.Redirect(w, r, "https://www.google.com", http.StatusSeeOther)
-	//renders.New(w, r, "home.page.go.tmpl", &models.TemplateData{})
+	renders.New(w, r, "home.page.go.tmpl", &models.TemplateData{
+		ShortenURL: os.Getenv("HOME_URL") + shorten_link,
+	})
+}
 
+func (m *Repository) GetLink(w http.ResponseWriter, r *http.Request) {
+	shorten_link := chi.URLParam(r, "shorten-url")
+	link, exists := m.DBRepo.GetLinkFromShortenLink(shorten_link)
+	if !exists {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	http.Redirect(w, r, link, http.StatusSeeOther)
 }

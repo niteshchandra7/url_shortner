@@ -11,6 +11,10 @@
     <button type="submit" class="btn btn-primary mb-3">Shorten URL</button>
   </div>
 </form>
+  {{$link := .ShortenURL}}
+  {{if $link}}
+    <p class="mx-5">Shortened URL is: <a href=//{{$link}}>{{$link}}</a></p>
+  {{end}}
 {{end}}
 
 
