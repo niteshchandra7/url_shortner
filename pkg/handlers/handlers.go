@@ -48,7 +48,7 @@ func (m *Repository) PostShorten(w http.ResponseWriter, r *http.Request) {
 		shorten_link = m.DBRepo.CreateAndInsertShortenLinkFromLink(link)
 	}
 	renders.New(w, r, "home.page.go.tmpl", &models.TemplateData{
-		ShortenURL: os.Getenv("HOME_URL") + shorten_link,
+		ShortenURL: os.Getenv("HOME_URL") + "/url/" + shorten_link,
 	})
 }
 

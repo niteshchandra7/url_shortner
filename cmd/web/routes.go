@@ -13,6 +13,6 @@ func GetRoutes() http.Handler {
 	mux.Use(NoSurf)
 	mux.Get("/", handlers.Repo.Home)
 	mux.Post("/shorten", handlers.Repo.PostShorten)
-	mux.Get("/{shorten-url}",handlers.Repo.GetLink)
+	mux.Get("/url/{shorten-url}", handlers.Repo.GetLink)
 	return mux
 }

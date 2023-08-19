@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  url_shortner:
+    container_name: url_shortner
+    env_file:
+      - ./.env
+    ports:
+      - "3000:3000"
+    build: ./
+    depends_on:
+      - postgres-db
+      - migrate
+    networks:
+      - net
+  postgres-db:
+    container_name: postgres-db
+    env_file:
+      - ./.env
+    # environment:
+    #   POSTGRES_PASSWORD: password
+    #   POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    build: ./db
+    networks:
+      - net
+    volumes:
+      - db:/var/lib/postgresql/data
+  migrate:
+    container_name: migrate
+    image: migrate/migrate
+    env_file:
+      - ./.env
+    volumes:
+      - ./db/migration:/migrations
+    networks:
+      - net
+    entrypoint:
+      [
+        "migrate",
+        "-path",
+        "/migrations/",
+        "-database",
+        "$DATABASE_URL",
+        #"postgres://postgres:password@postgres-db:5432/postgres?sslmode=disable",
+      ]
+    command: ["up"]
+    depends_on:
+      - postgres-db
+    restart: on-failure
+volumes:
+  db:
+networks:
+  net:

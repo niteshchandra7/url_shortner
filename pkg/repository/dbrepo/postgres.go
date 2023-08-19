@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -37,7 +38,10 @@ func (m *PostgresDBRepo) CreateAndInsertShortenLinkFromLink(link string) string 
 
 	query := `insert into links (link, shorten_link) values ($1,$2)`
 
-	m.DB.ExecContext(ctx, query, link, shorten_link)
+	_, err := m.DB.ExecContext(ctx, query, link, shorten_link)
+	if err != nil {
+		log.Println("insertion failed!", err)
+	}
 
 	return shorten_link
 }
